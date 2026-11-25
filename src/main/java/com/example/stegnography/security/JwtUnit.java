@@ -88,6 +88,7 @@ public class JwtUnit {
 
             Jwts.parser()
                     .verifyWith(key)
+                    .clockSkewSeconds(60)
                     .build()
                     .parseSignedClaims(token);
 

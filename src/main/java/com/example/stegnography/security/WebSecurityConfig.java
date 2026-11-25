@@ -57,9 +57,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/auth/**",
-                                        "/api/test/all",
-                                        "/h2-console",
-                                        "/**"
+                                        "/api/test/all"
+
                                 ).permitAll() // Use 'requestMatchers' instead of 'antMatchers'
                                 .anyRequest().authenticated()
                 );
