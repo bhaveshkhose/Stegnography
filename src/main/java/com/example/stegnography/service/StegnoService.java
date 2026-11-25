@@ -1,12 +1,15 @@
 package com.example.stegnography.service;
 
-import org.springframework.web.multipart.MultipartFile;
-
+import com.example.stegnography.request.InsertMsgRequest;
+import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+
+
+@Service
 public class StegnoService {
 
 
@@ -15,16 +18,16 @@ public class StegnoService {
         return (value & ~1) | bit ;
     }
 
-
     //for inserting the msg inside the image
-    public static void replaceBits(byte[] msg , BufferedImage image) throws IOException {
-
+    public String replaceBits(InsertMsgRequest insertMsgRequest) throws IOException {
+        byte[] msg = insertMsgRequest.getMassage().getBytes();
         int bitSize = msg.length * 8 ;
         int bitIndex = 0 ;
 
-        for(int i = 0 ; i < image.getHeight() && bitIndex < bitSize ; i++){
-            for(int j =0 ; j < image.getWidth() && bitIndex < bitSize ; j++){
-                int rgb = image.getRGB(j , i);
+
+        for(int i = 0 ; i < insertMsgRequest.getImage().getHeight() && bitIndex < bitSize ; i++){
+            for(int j =0 ; j < insertMsgRequest.getImage().getWidth() && bitIndex < bitSize ; j++){
+                int rgb = insertMsgRequest.getImage().getRGB(j , i);
 
                 int r = (rgb >> 16) & 0xFF ;
                 int g = (rgb >> 8) & 0xFF ;
@@ -67,25 +70,20 @@ public class StegnoService {
                     bitIndex++;
 
                 }
-
-
                 int newRgb =
                         (rgb & 0xFF000000)
                                 | (r << 16)
                                 | (g << 8)
                                 | b;
 
-                image.setRGB(j, i, newRgb);
+                insertMsgRequest.getImage().setRGB(j, i, newRgb);
             }
-
-
         }
-        System.out.println("The msg in inserted successfully");
-
+        return "The msg in inserted successfully";
     }
 
     //for extracting the bits for the image
-    public static void extractMsg() throws IOException{
+    public String extractMsg() throws IOException{
         BufferedImage image = ImageIO.read(new File("src/output.png"));
 
         int value = 0 ;
@@ -122,8 +120,7 @@ public class StegnoService {
             }
         }
 
-        System.out.println("Extracted ASCII value: " + value);
-        System.out.println("Extracted character: " + (char) value);
+        return "Extracted character: " + (char) value;
     }
 
 
