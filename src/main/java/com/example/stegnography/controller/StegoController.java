@@ -3,6 +3,7 @@ package com.example.stegnography.controller;
 
 import com.example.stegnography.request.ExtractMsgRequest;
 import com.example.stegnography.request.InsertMsgRequest;
+import com.example.stegnography.service.ImageValidationService;
 import com.example.stegnography.service.StegnoService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,14 @@ import java.io.IOException;
 public class StegoController{
 
     public final StegnoService stegnoService ;
+    public final ImageValidationService imageValidationService;
 
-    public StegoController(StegnoService stegnoService) {
+    public StegoController(
+            StegnoService stegnoService,
+            ImageValidationService imageValidationService) {
 
         this.stegnoService = stegnoService;
+        this.imageValidationService = imageValidationService;
     }
 
     @PostMapping(
@@ -61,4 +66,16 @@ public class StegoController{
         return ResponseEntity.ok(msg);
 
     }
+
+    @PostMapping(
+            value = "/inspectImg",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<String> inspectImg(MultipartFile image){
+        BufferedImage bufferedImage = imageValidationService.validateImage(image);
+        int charCount = imageValidationService.characterLimit(bufferedImage);
+
+        return ResponseEntity.ok("The Image is valid and Can store upto "+charCount+ " character");
+    }
+
 }

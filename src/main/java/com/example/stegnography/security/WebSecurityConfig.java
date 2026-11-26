@@ -58,7 +58,6 @@ public class WebSecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/api/auth/**",
                                         "/api/test/all"
-
                                 ).permitAll() // Use 'requestMatchers' instead of 'antMatchers'
                                 .anyRequest().authenticated()
                 );
