@@ -3,8 +3,11 @@ package com.example.stegnography.controller;
 
 import com.example.stegnography.request.ExtractMsgRequest;
 import com.example.stegnography.request.InsertMsgRequest;
+import com.example.stegnography.response.StegnographyOperationResponse;
 import com.example.stegnography.service.ImageValidationService;
 import com.example.stegnography.service.StegnoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,10 +75,39 @@ public class StegoController{
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<String> inspectImg(MultipartFile image){
-        BufferedImage bufferedImage = imageValidationService.validateImage(image);
-        int charCount = imageValidationService.characterLimit(bufferedImage);
+        try {
+            BufferedImage bufferedImage = imageValidationService.validateImage(image);
+            int charCount = imageValidationService.characterLimit(bufferedImage);
 
-        return ResponseEntity.ok("The Image is valid and Can store upto "+charCount+ " character");
+            return ResponseEntity.status(HttpStatus.OK).body("Character can hide "+charCount);
+
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "Error :"+e.getMessage()
+            );
+        }
+    }
+
+
+    @PostMapping(
+        value = "/stegoOperation",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<StegnographyOperationResponse> StegnographyOperation(
+            @RequestParam String msg ,
+            @RequestParam MultipartFile image
+    ){
+        BufferedImage bufferedImage = imageValidationService.validateImage(image);
+        Long byteStorageLimit = (long)imageValidationService.characterLimit(bufferedImage);
+        String imageName = image.getOriginalFilename();
+        int imageWidth = bufferedImage.getWidth();
+        int imageHeight = bufferedImage.getHeight();
+        int msgLength = msg.length();
+
+
+
+
     }
 
 }

@@ -6,3 +6,4 @@ public class InvalidImageException extends RuntimeException{
             super(msg);
         }
 }
+
